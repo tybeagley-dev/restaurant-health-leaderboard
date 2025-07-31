@@ -234,6 +234,24 @@
             transform: translateY(-1px);
         }
 
+        .delete-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 10px;
+            opacity: 0.7;
+        }
+
+        .delete-btn:hover {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -400,16 +418,20 @@
                             <div class="restaurant-location">${restaurant.location}</div>
                         </div>
                         <div class="score ${scoreClass}">${restaurant.score}</div>
+                        <button class="delete-btn" onclick="deleteEntry(${index})">×</button>
                     </div>
                 `;
             }).join('');
         }
 
         function clearLeaderboard() {
-            if (restaurants.length > 0 && confirm('Clear all entries from the leaderboard?')) {
-                restaurants = [];
-                updateLeaderboard();
-            }
+            restaurants = [];
+            updateLeaderboard();
+        }
+
+        function deleteEntry(index) {
+            restaurants.splice(index, 1);
+            updateLeaderboard();
         }
 
         // Allow Enter key to add entries
