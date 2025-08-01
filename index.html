@@ -351,6 +351,18 @@
     <script>
         let restaurants = [];
 
+        function saveToLocalStorage() {
+            localStorage.setItem('restaurantLeaderboard', JSON.stringify(restaurants));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('restaurantLeaderboard');
+            if (saved) {
+                restaurants = JSON.parse(saved);
+                updateLeaderboard();
+            }
+        }
+
         function addEntry() {
             const name = document.getElementById('restaurantName').value.trim();
             const location = document.getElementById('location').value.trim();
@@ -370,6 +382,7 @@
 
             restaurants.push(restaurant);
             restaurants.sort((a, b) => b.score - a.score);
+            saveToLocalStorage();
 
             updateLeaderboard();
             clearInputs();
@@ -428,11 +441,13 @@
 
         function clearLeaderboard() {
             restaurants = [];
+            saveToLocalStorage();
             updateLeaderboard();
         }
 
         function deleteEntry(index) {
             restaurants.splice(index, 1);
+            saveToLocalStorage();
             updateLeaderboard();
         }
 
@@ -443,8 +458,11 @@
             }
         });
 
-        // Focus on first input on load
-        document.getElementById('restaurantName').focus();
+        // Initialize app on load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFromLocalStorage();
+            document.getElementById('restaurantName').focus();
+        });
     </script>
 </body>
 </html>
