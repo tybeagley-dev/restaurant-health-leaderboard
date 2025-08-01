@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Health Score Leaderboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .input-section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .input-row {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .input-group {
+            flex: 1;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .add-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .leaderboard {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .leaderboard-header {
+            background: linear-gradient(45deg, #333, #555);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .leaderboard-header h2 {
+            font-size: 1.8rem;
+        }
+
+        .entry-count {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .leaderboard-entry {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .leaderboard-entry:hover {
+            background: #f8f9fa;
+            transform: translateX(5px);
+        }
+
+        .leaderboard-entry:last-child {
+            border-bottom: none;
+        }
+
+        .rank {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 20px;
+            color: white;
+        }
+
+        .rank.first {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .rank.second {
+            background: linear-gradient(45deg, #C0C0C0, #A8A8A8);
+            box-shadow: 0 5px 15px rgba(192, 192, 192, 0.4);
+        }
+
+        .rank.third {
+            background: linear-gradient(45deg, #CD7F32, #B8860B);
+            box-shadow: 0 5px 15px rgba(205, 127, 50, 0.4);
+        }
+
+        .rank.other {
+            background: linear-gradient(45deg, #6c757d, #495057);
+        }
+
+        .restaurant-info {
+            flex: 1;
+        }
+
+        .restaurant-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .restaurant-location {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .score {
+            font-size: 2rem;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 10px;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .score.excellent {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .score.good {
+            background: linear-gradient(45deg, #8BC34A, #689F38);
+            color: white;
+        }
+
+        .score.fair {
+            background: linear-gradient(45deg, #FF9800, #F57C00);
+            color: white;
+        }
+
+        .score.poor {
+            background: linear-gradient(45deg, #F44336, #D32F2F);
+            color: white;
+        }
+
+        .clear-btn {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .clear-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .delete-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 15px;
+            opacity: 1;
+            min-width: 30px;
+        }
+
+        .delete-btn:hover {
+            background: linear-gradient(45deg, #ff5252, #d32f2f);
+            transform: scale(1.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .new-entry {
+            animation: pulse 0.6s ease-in-out;
+        }
+
+        @media (max-width: 768px) {
+            .input-row {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .leaderboard-entry {
+                padding: 15px;
+            }
+            
+            .rank {
+                width: 50px;
+                height: 50px;
+                margin-right: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 Restaurant Health Score Challenge</h1>
+            <p>Live leaderboard - See how your restaurant stacks up!</p>
+        </div>
+
+        <div class="input-section">
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="restaurantName">Restaurant Name</label>
+                    <input type="text" id="restaurantName" placeholder="Enter restaurant name">
+                </div>
+                <div class="input-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" placeholder="City, State">
+                </div>
+                <div class="input-group">
+                    <label for="healthScore">Health Score</label>
+                    <input type="number" id="healthScore" placeholder="0-100" min="0" max="100">
+                </div>
+                <button class="add-btn" onclick="addEntry()">Add to Board</button>
+            </div>
+        </div>
+
+        <div class="leaderboard">
+            <div class="leaderboard-header">
+                <h2>Live Rankings</h2>
+                <div>
+                    <span class="entry-count" id="entryCount">0 restaurants</span>
+                    <button class="clear-btn" onclick="clearLeaderboard()">Clear All</button>
+                </div>
+            </div>
+            <div id="leaderboardContent">
+                <div class="empty-state">
+                    <h3>Ready to compete!</h3>
+                    <p>Add the first restaurant to get started</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let restaurants = [];
+
+        function saveToLocalStorage() {
+            localStorage.setItem('restaurantLeaderboard', JSON.stringify(restaurants));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('restaurantLeaderboard');
+            if (saved) {
+                restaurants = JSON.parse(saved);
+                updateLeaderboard();
+            }
+        }
+
+        function addEntry() {
+            const name = document.getElementById('restaurantName').value.trim();
+            const location = document.getElementById('location').value.trim();
+            const score = parseInt(document.getElementById('healthScore').value);
+
+            if (!name || !location || isNaN(score) || score < 0 || score > 100) {
+                alert('Please fill in all fields with valid data (score 0-100)');
+                return;
+            }
+
+            const restaurant = {
+                name,
+                location,
+                score,
+                timestamp: Date.now()
+            };
+
+            restaurants.push(restaurant);
+            restaurants.sort((a, b) => b.score - a.score);
+            saveToLocalStorage();
+
+            updateLeaderboard();
+            clearInputs();
+        }
+
+        function clearInputs() {
+            document.getElementById('restaurantName').value = '';
+            document.getElementById('location').value = '';
+            document.getElementById('healthScore').value = '';
+            document.getElementById('restaurantName').focus();
+        }
+
+        function updateLeaderboard() {
+            const content = document.getElementById('leaderboardContent');
+            const entryCount = document.getElementById('entryCount');
+            
+            entryCount.textContent = `${restaurants.length} restaurant${restaurants.length !== 1 ? 's' : ''}`;
+
+            if (restaurants.length === 0) {
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Ready to compete!</h3>
+                        <p>Add the first restaurant to get started</p>
+                    </div>
+                `;
+                return;
+            }
+
+            content.innerHTML = restaurants.map((restaurant, index) => {
+                const rank = index + 1;
+                let rankClass = 'other';
+                if (rank === 1) rankClass = 'first';
+                else if (rank === 2) rankClass = 'second';
+                else if (rank === 3) rankClass = 'third';
+
+                let scoreClass = 'poor';
+                if (restaurant.score >= 90) scoreClass = 'excellent';
+                else if (restaurant.score >= 80) scoreClass = 'good';
+                else if (restaurant.score >= 70) scoreClass = 'fair';
+
+                const isNew = Date.now() - restaurant.timestamp < 2000;
+
+                return `
+                    <div class="leaderboard-entry ${isNew ? 'new-entry' : ''}">
+                        <div class="rank ${rankClass}">${rank}</div>
+                        <div class="restaurant-info">
+                            <div class="restaurant-name">${restaurant.name}</div>
+                            <div class="restaurant-location">${restaurant.location}</div>
+                        </div>
+                        <div class="score ${scoreClass}">${restaurant.score}</div>
+                        <button class="delete-btn" onclick="deleteEntry(${index})">×</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function clearLeaderboard() {
+            restaurants = [];
+            saveToLocalStorage();
+            updateLeaderboard();
+        }
+
+        function deleteEntry(index) {
+            restaurants.splice(index, 1);
+            saveToLocalStorage();
+            updateLeaderboard();
+        }
+
+        // Allow Enter key to add entries
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addEntry();
+            }
+        });
+
+        // Initialize app on load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFromLocalStorage();
+            document.getElementById('restaurantName').focus();
+        });
+    </script>
+</body>
+</html>
